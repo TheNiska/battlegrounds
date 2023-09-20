@@ -1,5 +1,6 @@
 from models import Card, Game
 import curses
+import custom_cards as cc
 
 
 def main(stdscr):
@@ -10,8 +11,9 @@ def main(stdscr):
     stdscr.timeout(1000 // FPS)
 
     game = Game(stdscr)
-    game.set_random_board()
-    game.run()
+    game.top_board = [cc.Annoy_o_Tron(), cc.Annoy_o_Tron(), cc.Dozy_Whelp()]
+    game.bottom_board = [cc.Dozy_Whelp(), cc.Annoy_o_Tron(), cc.Annoy_o_Tron()]
+    game.run_in_terminal()
 
 
 if __name__ == '__main__':

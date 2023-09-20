@@ -4,14 +4,16 @@ from time import sleep
 
 
 class Card:
-    def __init__(self, attack, health, is_bubbled=False, is_poison=False,
-                 is_reborn=False, is_taunt=False):
-        self.attack = attack
-        self.health = health
-        self.is_bubbled = is_bubbled
-        self.is_poison = is_poison
-        self.is_reborn = is_reborn
-        self.is_taunt = is_taunt
+    def __init__(self, attack=None, health=None):
+        self.attack = attack if attack is not None else random.randint(1, 15)
+        self.health = health if health is not None else random.randint(1, 18)
+
+        self.is_bubbled = False
+        self.is_poison = False
+        self.is_reborn = False
+        self.is_taunt = False
+        self.can_attack = True if self.attack > 0 else False
+        self.lost_hp = False
 
         self.is_dead = False
         self.attacked = False
@@ -24,6 +26,10 @@ class Card:
         health_info = str(self.health)
         if self.is_bubbled:
             health_info += 'b'
+        if self.is_reborn:
+            health_info += 'r'
+        if self.is_taunt:
+            health_info += 't'
 
         return f"|{atk_info: <3}|{health_info: >3}|"
 
@@ -35,6 +41,10 @@ class Card:
         health_info = str(self.health)
         if self.is_bubbled:
             health_info += 'b'
+        if self.is_reborn:
+            health_info += 'r'
+        if self.is_taunt:
+            health_info += 't'
 
         s1 = '\u250c' + '\u2500' * 7 + '\u2510' + '\n'
         s2 = '\u2502' + ' ' * 7 + '\u2502' + '\n'
@@ -64,18 +74,24 @@ class Card:
 
         if other.is_poison:
             self.health = 0
-            self.die()
+            self.lost_hp = True
             return
 
         self.health -= other.attack
-        if self.health <= 0:
-            self.die()
+        self.lost_hp = True
 
     def die(self):
-        if self.reborn:
-            self.reborn = False
-            pass
+        '''If summons something after death, returns it. Otherwise
+        returns None'''
         self.is_dead = True
+
+        if self.is_reborn:
+            self.is_reborn = False
+            reborned_card = self.__class__()
+            reborned_card.health = 1
+            return reborned_card
+
+        return None
 
 
 class Game:
@@ -90,14 +106,30 @@ class Game:
         self.print_board()
         self.scr.refresh()
         while self.top_board and self.bottom_board:
-            sleep(1)
+            sleep(4)
             attacker, attacked, board, opp_board = self.next_card()
+
+            # run new iteration if attacker cannot attack
+            if not attacker.can_attack:
+                continue
+
             attacker.do_attack(attacked)
 
-            if attacker.is_dead:
-                board.remove(attacker)
-            if attacked.is_dead:
-                opp_board.remove(attacked)
+            if attacker.health <= 0:
+                index = board.index(attacker)
+                summon = attacker.die()
+                if summon is not None:
+                    board[index] = summon
+                else:
+                    board.pop(index)
+
+            if attacked.health <= 0:
+                index = opp_board.index(attacked)
+                summon = attacked.die()
+                if summon is not None:
+                    opp_board[index] = summon
+                else:
+                    opp_board.pop(index)
 
             self.scr.clear()
             self.print_board()
@@ -111,14 +143,20 @@ class Game:
             card_num += 1
             sprite = list(str(card).split('\n'))
             for i in range(len(sprite)):
-                self.scr.addstr(i + 1, card_num * 9, sprite[i])
+                if card.lost_hp:
+                    self.scr.addstr(i + 1, card_num * 9, sprite[i], curses.A_DIM)
+                else:
+                    self.scr.addstr(i + 1, card_num * 9, sprite[i])
 
         card_num = -1
         for card in self.bottom_board:
             card_num += 1
             sprite = list(str(card).split('\n'))
             for i in range(len(sprite)):
-                self.scr.addstr(i + 15, card_num * 9, sprite[i])
+                if card.lost_hp:
+                    self.scr.addstr(i + 15, card_num * 9, sprite[i], curses.A_DIM)
+                else:
+                    self.scr.addstr(i + 15, card_num * 9, sprite[i])
 
     def set_random_board(self):
         for i in range(14):
@@ -155,7 +193,8 @@ class Game:
             opposite_board = self.top_board
 
         for card in board:
-            if not card.attacked:
+            # not done
+            if not card.attacked and card.attack >= 0:
                 card.attacked = True
                 self.is_top_first = not self.is_top_first
                 return (card, random.choice(opposite_board), board,
