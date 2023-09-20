@@ -4,11 +4,15 @@ from time import sleep
 
 
 class Card:
-    def __init__(self, attack, health, is_bubbled=False, is_poison=False):
+    def __init__(self, attack, health, is_bubbled=False, is_poison=False,
+                 is_reborn=False, is_taunt=False):
         self.attack = attack
         self.health = health
         self.is_bubbled = is_bubbled
         self.is_poison = is_poison
+        self.is_reborn = is_reborn
+        self.is_taunt = is_taunt
+
         self.is_dead = False
         self.attacked = False
 
@@ -41,8 +45,17 @@ class Card:
         return s1 + s2 + s3 + s4 + s5
 
     def do_attack(self, other):
+        self.before_attack(other)
+        other.before_attacked(self)
+
         other.takes_damage(self)
         self.takes_damage(other)
+
+    def before_attack(self, other):
+        pass
+
+    def before_attacked(self, other):
+        pass
 
     def takes_damage(self, other):
         if self.is_bubbled:
@@ -59,6 +72,9 @@ class Card:
             self.die()
 
     def die(self):
+        if self.reborn:
+            self.reborn = False
+            pass
         self.is_dead = True
 
 
@@ -70,7 +86,7 @@ class Game:
         self.is_top_first = True
         self.scr = scr
 
-    def run(self):
+    def run_in_terminal(self):
         self.print_board()
         self.scr.refresh()
         while self.top_board and self.bottom_board:
