@@ -1,14 +1,18 @@
 from models import Card, Game
+import curses
 
 
-def main():
-    game = Game()
+def main(stdscr):
+    FPS = 60
+    # Инициализация curses
+    curses.curs_set(0)
+    stdscr.nodelay(1)
+    stdscr.timeout(1000 // FPS)
+
+    game = Game(stdscr)
     game.set_random_board()
-    print(game.top_board)
-    print(game.bottom_board)
-    print('------' + 'Game Started' + '------')
     game.run()
 
 
 if __name__ == '__main__':
-    main()
+    curses.wrapper(main)

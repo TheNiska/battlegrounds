@@ -1,4 +1,6 @@
 import random
+import curses
+from time import sleep
 
 
 class Card:
@@ -61,28 +63,46 @@ class Card:
 
 
 class Game:
-    def __init__(self, lang='ru'):
+    def __init__(self, scr, lang='ru'):
         self.lang = lang
         self.top_board = []
         self.bottom_board = []
         self.is_top_first = True
+        self.scr = scr
 
     def run(self):
+        self.print_board()
+        self.scr.refresh()
         while self.top_board and self.bottom_board:
+            sleep(1)
             attacker, attacked, board, opp_board = self.next_card()
-
-            print(f"{attacker} атакует {attacked}: -> ", end='')
             attacker.do_attack(attacked)
-            print(f"{attacker}, {attacked}")
 
             if attacker.is_dead:
                 board.remove(attacker)
             if attacked.is_dead:
                 opp_board.remove(attacked)
 
-            print(self.top_board)
-            print(self.bottom_board)
-            print('--' * 30)
+            self.scr.clear()
+            self.print_board()
+            self.scr.refresh()
+
+        sleep(15)
+
+    def print_board(self):
+        card_num = -1
+        for card in self.top_board:
+            card_num += 1
+            sprite = list(str(card).split('\n'))
+            for i in range(len(sprite)):
+                self.scr.addstr(i + 1, card_num * 9, sprite[i])
+
+        card_num = -1
+        for card in self.bottom_board:
+            card_num += 1
+            sprite = list(str(card).split('\n'))
+            for i in range(len(sprite)):
+                self.scr.addstr(i + 15, card_num * 9, sprite[i])
 
     def set_random_board(self):
         for i in range(14):
