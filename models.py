@@ -14,6 +14,7 @@ class Card:
         self.is_taunt = False
         self.can_attack = True if self.attack > 0 else False
         self.lost_hp = False
+        self.name = 'card'
 
         self.is_dead = False
         self.attacked = False
@@ -95,7 +96,7 @@ class Card:
 
 
 class Game:
-    def __init__(self, scr, lang='ru'):
+    def __init__(self, scr=None, lang='ru'):
         self.lang = lang
         self.top_board = []
         self.bottom_board = []
@@ -180,7 +181,9 @@ class Game:
         if prob2 == 5:
             is_pois = True
 
-        card = Card(atk, hlt, is_bubbled=is_bub, is_poison=is_pois)
+        card = Card(attack=atk, health=hlt)
+        card.is_bubbled = is_bub
+        card.is_poison = is_pois
         return card
 
     def next_card(self):
