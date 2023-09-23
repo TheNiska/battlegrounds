@@ -1,7 +1,11 @@
-from models import Card
+from models.base_card import Card
+from models.pygame_card import PyGameCard
+
+is_pygame = True
+inherited_class = PyGameCard if is_pygame else Card
 
 
-class Annoy_o_Tron(Card):
+class Annoy_o_Tron(inherited_class):
     def __init__(self):
         super().__init__(attack=1, health=2)
         self.name = 'Annoy-o-Tron'
@@ -9,7 +13,7 @@ class Annoy_o_Tron(Card):
         self.is_taunt = True
 
 
-class Dozy_Whelp(Card):
+class Dozy_Whelp(inherited_class):
     def __init__(self):
         super().__init__(attack=0, health=3)
         self.name = 'Dozy Whelp'
@@ -20,8 +24,13 @@ class Dozy_Whelp(Card):
         self.can_attack = True  # need to do it if default attack is 0
 
 
-class Micro_Mummy(Card):
+class Micro_Mummy(inherited_class):
     def __init__(self):
         super().__init__(attack=1, health=2)
         self.name = 'Micro Mummy'
         self.is_reborn = True
+
+
+if __name__ == "__main__":
+    c = Annoy_o_Tron()
+    print(c.__class__)
