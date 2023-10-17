@@ -87,9 +87,9 @@ class Card:
         self.is_dead = True
 
         if self.is_reborn:
-            self.is_reborn = False
             reborned_card = self.__class__()
             reborned_card.health = 1
+            reborned_card.is_reborn = False
             return reborned_card
 
         return None

@@ -32,5 +32,10 @@ class Micro_Mummy(inherited_class):
 
 
 if __name__ == "__main__":
-    c = Annoy_o_Tron()
-    print(c.__class__)
+    def_classes = [Card, PyGameCard, inherited_class]
+    global_objs = list(globals().items())
+
+    for name, obj in global_objs:
+        if obj not in def_classes and isinstance(obj, type):
+            card = obj()
+            print(card.name)

@@ -14,6 +14,7 @@ class PyGameCard(Card):
         super().__init__(attack=attack, health=health)
         self.stats_font = stats_font
         self.text_font = text_font
+        self.center = None
 
     def get_card_surface(self, card_width=130, card_height=170):
         card_surf = pygame.Surface((card_width, card_height))

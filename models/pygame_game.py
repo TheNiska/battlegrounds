@@ -19,17 +19,26 @@ class PyGame(Game):
 
     def run(self):
         running = True
+        FPS = 0.2
+        clock = pygame.time.Clock()
+
+        attacker, attacked, board, opp_board = self.next_card()
         self.screen.fill((255, 255, 255))
         self.draw_board(self.screen, self.top_board, 20)
         self.draw_board(self.screen, self.bottom_board, 220)
+        pygame.draw.line(self.screen, (0, 0, 255),
+                         attacker.center, attacked.center, 5)
+        pygame.draw.circle(self.screen, (0, 0, 255), attacked.center, 20)
         pygame.display.flip()
+        clock.tick(FPS)
         while self.top_board and self.bottom_board and running:
-            sleep(2)
-            self.screen.fill((255, 255, 255))
-            attacker, attacked, board, opp_board = self.next_card()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
             # run new iteration if attacker cannot attack
             if not attacker.can_attack:
+                attacker, attacked, board, opp_board = self.next_card()
                 continue
 
             attacker.do_attack(attacked)
@@ -50,19 +59,22 @@ class PyGame(Game):
                 else:
                     opp_board.pop(index)
 
+            attacker, attacked, board, opp_board = self.next_card()
+            self.screen.fill((255, 255, 255))
             self.draw_board(self.screen, self.top_board, 20)
             self.draw_board(self.screen, self.bottom_board, 220)
+            pygame.draw.line(self.screen, (0, 0, 255),
+                             attacker.center, attacked.center, 5)
+            pygame.draw.circle(self.screen, (0, 0, 255), attacked.center, 20)
             pygame.display.flip()
+            clock.tick(FPS)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-        sleep(15)
+        clock.tick(0.4)
         pygame.quit()
 
     def draw_board(self, surface, board, y):
         for i in range(len(board)):
             card_surf = board[i].get_card_surface()
             x = 20 + (i * (CARD_WIDTH + 20))
+            board[i].center = (x + CARD_WIDTH // 2, y + CARD_HEIGHT // 2)
             surface.blit(card_surf, (x, y))
