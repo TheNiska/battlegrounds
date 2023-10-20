@@ -9,7 +9,7 @@ class Card {
 public:
     int attack;
     int health;
-    bool is_bubbled;
+    bool is_bubbled = false;
 
     bool has_lost_hp = false;
     bool is_poison = false;
@@ -22,6 +22,11 @@ public:
         attack = attack_arg;
         health = health_arg;
         is_bubbled = is_bubbled_arg;
+    };
+
+    Card() {
+        attack = 0;
+        health = 0;
     };
 
     string get_string() {

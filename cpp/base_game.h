@@ -5,29 +5,35 @@
 
 using namespace std;
 
+void delete_element(Card *arr, int *len, int index) {
+    for (int i = index; i < *len - 1; i++) {
+        *(arr + i) = *(arr + i + 1);
+    };
+    (*len)--;
+};
+
+
 class Game {
 public:
     bool is_top_move = true;
-    vector<Card> top_board;
-    vector<Card> bottom_board;
+    Card top_board[7];
+    Card bottom_board[7];
+    int top_len = 7;
+    int btm_len = 7;
+    
 
-    void init_board() {
-        Card card1(7, 9, false);
-        Card card2(3, 15, false);
-
-        for (int i = 0; i < 7; i++) {
-            top_board.push_back(card1);
-            bottom_board.push_back(card2);
+    void print_boards() {
+        for (int i = 0; i < top_len; i++) {
+            cout << (*(top_board + i)).get_string() << "  ";
         };
-
-        cout << "Size: " << top_board.size() << endl;
-
-        for (Card card: top_board) {
-            cout << card.get_string() << endl;
+        cout << endl;
+        for (int i = 0; i < btm_len; i++) {
+            cout << (*(bottom_board + i)).get_string() << "  ";
         };
-
+        cout << endl;
     };
 
+    /*
     tuple<Card*, Card*, bool> next_cards() {
         vector<Card>* brd;
         vector<Card>* opp_brd;
@@ -76,6 +82,7 @@ public:
                 card.has_attacked = true;
                 is_top_move = !is_top_move;
 
+                cout << card.get_string();
                 get<0>(result) = &card;
                 get<2>(result) = !is_top_move;
 
@@ -96,4 +103,5 @@ public:
         return next_cards();
 
     }
+    */
 };

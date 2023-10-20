@@ -10,9 +10,6 @@ int main() {
     card1.do_attack(&card2);
 
     Game game;
-    game.init_board();
-    tuple<Card*, Card*, bool> result = game.next_cards();
-    cout << (get<0>(result))->get_string() << endl;
-
+    game.print_boards();
     return 0;
 }
